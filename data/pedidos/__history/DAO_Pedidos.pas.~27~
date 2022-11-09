@@ -1,0 +1,200 @@
+unit DAO_Pedidos;
+
+interface
+uses
+  System.SysUtils,
+  Data.DB,
+  DTO_Pedidos,
+  FireDAC.Comp.Client,
+  FireDAC.Stan.Param;
+type
+  TDaoPedidos = class
+  strict private
+    const
+      Select: System.UnicodeString =
+          'SELECT ' +
+          '  numero,'+
+          '  dataEmissao,'+
+          '  codCliente,'+
+          '  valorTotal '+
+          'FROM ' +
+          '  Pedidos ';
+      Insert: System.UnicodeString =
+          'INSERT INTO Pedidos(' +
+          '  dataEmissao,'+
+          '  codCliente,'+
+          '  valorTotal) '+
+          'VALUES('+
+          '  :dataEmissao,'+
+          '  :codCliente,'+
+          '  :valorTotal) ';
+      Update: System.UnicodeString =
+          'UPDATE ' +
+          ' Pedidos ' +
+          'SET ' +
+          '  dataEmissao = :dataEmissao, '+
+          '  codCliente = :codCliente, '+
+          '  valorTotal = :valorTotal '+
+          'WHERE ' +
+          '  numero = :numero';
+
+      Delete: System.UnicodeString =
+          'DELETE FROM Pedidos ' +
+          'WHERE ' +
+          '  numero = :numero';
+  private
+    FConnection: TFDConnection;
+    class procedure InternalLoad(var AQuery: TFDQuery; const AObject: TDtoPedido); static;
+    function GetID(AQuery: TFDQuery): System.Integer;
+  public
+      constructor Create(AConnection: TFDConnection);
+      procedure UnsafeSave(const AObject: TDtoPedido);
+      procedure Save(const AObject: TDtoPedido);
+      function Load   (const AObject: TDtoPedido; const Anumero: System.Integer): Boolean;
+      function LoadListPorcodCliente  (const AObjectList: TDtoPedidos; const AcodCliente: System.String): Boolean;
+      procedure UnSafeDelete (const Anumero: System.Integer);
+      procedure SafeDelete (const Anumero: System.Integer);
+  end;
+implementation
+  uses
+    System.TypInfo;
+{ TDaoPedidos }
+
+constructor TDaoPedidos.Create(AConnection: TFDConnection);
+begin
+  FConnection := AConnection;
+end;
+
+class procedure TDaoPedidos.InternalLoad(var AQuery: TFDQuery;const AObject: TDtoPedido);
+begin
+  AObject.numero := AQuery.FieldByName('numero').AsInteger;
+  AObject.dataEmissao := AQuery.FieldByName('dataEmissao').AsDateTime;
+  AObject.codCliente := AQuery.FieldByName('codCliente').AsInteger;
+  AObject.valorTotal := AQuery.FieldByName('valorTotal').AsFloat;
+end;
+
+function TDaoPedidos.Load(const AObject: TDtoPedido; const Anumero: System.Integer): Boolean;
+const
+  CWhere =
+    ' WHERE ' +
+    '  numero = :numero ';
+var
+  LQuery: TFDQuery;
+begin
+  Result := False;
+  if (Anumero > 0) then
+  begin
+    LQuery := TFDQuery.Create(nil);
+    LQuery.Connection := FConnection;
+    LQuery.SQL.Add(Select);
+    LQuery.ParamByName('numero').AsInteger := Anumero;
+    LQuery.Open;
+    Result := not(LQuery.IsEmpty);
+    if not(LQuery.IsEmpty) then
+      InternalLoad(LQuery, AObject);
+  end;
+end;
+
+function TDaoPedidos.LoadListPorcodCliente(const AObjectList: TDtoPedidos;
+  const AcodCliente: System.String): Boolean;
+const
+  CWhere =
+    'WHERE ' +
+    '  codCliente = :codCliente ';
+var
+  LQuery: TFDQuery;
+  LObjectAux : TDtoPedido;
+begin
+  Result := False;
+  if (AcodCliente <> '') then
+  begin
+    LQuery := TFDQuery.Create(nil);
+    LQuery.Connection := FConnection;
+    LQuery.SQL.Add(Select+CWhere);
+    LQuery.ParamByName('codCliente').AsString := AcodCliente;
+    LQuery.Open;
+    Result := not(LQuery.IsEmpty);
+    if not(LQuery.IsEmpty) then
+    LQuery.First;
+    while not(LQuery.Eof) do
+    begin
+      LObjectAux := TDtoPedido.Create;
+      InternalLoad(LQuery, LObjectAux);
+      AObjectList.Add(LObjectAux);
+    end;
+  end;
+end;
+
+function TDaoPedidos.GetID(AQuery: TFDQuery): System.Integer;
+begin
+  AQuery.SQL.Clear;
+  AQuery.Open('select numero from pedidos order by numero desc limit 1');
+  if not(AQuery.IsEmpty) then
+    Result := AQuery.FieldByName('numero').AsInteger
+  else
+    Result := 0;
+  AQuery.SQL.Clear;
+end;
+
+procedure TDaoPedidos.SafeDelete(const Anumero: System.Integer);
+begin
+  FConnection.StartTransaction;
+  try
+    UnSafeDelete(Anumero);
+    FConnection.Commit;
+  except
+    FConnection.Rollback;
+    raise
+  end;
+end;
+
+procedure TDaoPedidos.Save(const AObject: TDtoPedido);
+begin
+   FConnection.StartTransaction;
+   try
+      UnsafeSave(AObject);
+      FConnection.Commit;
+   except
+      FConnection.Rollback;
+      raise;
+   end;
+end;
+
+procedure TDaoPedidos.UnSafeDelete(const Anumero: System.Integer);
+var
+  LQuery: TFDQuery;
+begin
+  LQuery := TFDQuery.Create(nil);
+  LQuery.Connection := FConnection;
+  LQuery.SQL.Add(Delete);
+  LQuery.ParamByName('numero').AsInteger := Anumero;
+  LQuery.ExecSQL;
+end;
+
+procedure TDaoPedidos.UnsafeSave(const AObject: TDtoPedido);
+var
+  LQuery: TFDQuery;
+  Lnumero: System.Integer;
+begin
+  LQuery := TFDQuery.Create(nil);
+  LQuery.Connection := FConnection;
+  try
+    if (AObject.numero <= 0) then
+    begin
+      LQuery.SQL.Add(Insert);
+    end else
+    begin
+      Lnumero := AObject.numero;
+      LQuery.SQL.Add(Update);
+      LQuery.ParamByName('numero').AsInteger := Lnumero;
+    end;
+    LQuery.ParamByName('dataEmissao').AsDateTime := AObject.dataEmissao;
+    LQuery.ParamByName('codCliente').AsInteger:= AObject.codCliente;
+    LQuery.ParamByName('valorTotal').AsFloat:= AObject.valorTotal;
+    LQuery.ExecSQL;
+    AObject.numero := GetId(LQuery);
+  finally
+    LQuery.Free;
+  end;
+end;
+end.

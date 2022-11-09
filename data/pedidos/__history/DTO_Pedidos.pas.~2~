@@ -1,0 +1,96 @@
+unit DTO_Pedidos;
+
+interface
+uses
+  System.Generics.Collections, FireDAC.Comp.Client;
+type
+  TDtoPedido = class;
+  TDtoPedidos = class;
+  TDtoPedido = class(TObject)
+  private
+    { private declarations }
+    FCodigo: System.Integer;
+    FNome: System.String;
+    FCidade: System.String;
+    FUf: System.String;
+    procedure InternalClear();
+    procedure SetCodigo(const ACodigo: System.Integer);
+    procedure SetNome(const ANome: System.String);
+    procedure SetCidade(const ACidade: System.String);
+    procedure SetUf(const AUf: System.String);
+    function GetCodigo(): System.Integer;
+    function GetNome(): System.String;
+    function GetCidade(): System.String;
+    function GetUf(): System.String;
+  public
+    constructor Create();
+    procedure Clear; inline;
+    property codigo: System.Integer read GetCodigo write SetCodigo;
+    property nome: System.String read GetNome write SetNome;
+    property cidade: System.String read GetCidade write SetCidade;
+    property uf: System.String read GetUf write SetUf;
+  end;
+  TDtoPedidos = class(TObjectList<TDtoPedido>)
+  end;
+implementation
+{ TDtoPedido }
+
+procedure TDtoPedido.Clear;
+begin
+  Self.InternalClear();
+end;
+
+constructor TDtoPedido.Create();
+begin
+  Self.InternalClear();
+end;
+
+function TDtoPedido.GetCodigo: System.Integer;
+begin
+  Result := FCodigo;
+end;
+
+function TDtoPedido.GetNome: System.String;
+begin
+  Result := FNome;
+end;
+
+function TDtoPedido.GetCidade: System.String;
+begin
+  Result := FCidade;
+end;
+
+function TDtoPedido.GetUf: System.String;
+begin
+  Result := FUf;
+end;
+
+procedure TDtoPedido.InternalClear;
+begin
+  FCodigo := 0;
+  FNome := '';
+  FCidade := '';
+  FUf := '';
+end;
+
+procedure TDtoPedido.SetCodigo(const ACodigo: System.Integer);
+begin
+  FCodigo := ACodigo;
+end;
+
+procedure TDtoPedido.SetNome(const ANome: System.String);
+begin
+  FNome := ANome;
+end;
+
+procedure TDtoPedido.SetCidade(const ACidade: System.String);
+begin
+  FCidade :=ACidade;
+end;
+
+procedure TDtoPedido.SetUf(const AUf: System.String);
+begin
+  FUf := AUf;
+end;
+
+end.

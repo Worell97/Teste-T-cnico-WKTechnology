@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2022/11/08 16:42:44.000.140,=D:\Projetos\Embarcadero\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:22:48.000.084,D:\Projetos\Embarcadero\Unit1.dfm=D:\Projetos\Embarcadero\PedidosVenda.dfm</Transaction>
+    <Transaction>2022/11/08 17:22:48.000.084,D:\Projetos\Embarcadero\Unit1.pas=D:\Projetos\Embarcadero\PedidosVenda.pas</Transaction>
+    <Transaction>2022/11/08 17:23:36.000.319,D:\Projetos\Embarcadero\Project1.dproj=D:\Projetos\Embarcadero\TesteDelphi\TesteDelphi.dproj</Transaction>
+    <Transaction>2022/11/08 17:32:42.000.949,=D:\Projetos\Embarcadero\TesteDelphi\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:33:18.000.514,D:\Projetos\Embarcadero\TesteDelphi\DAO_Clientes.pas=D:\Projetos\Embarcadero\TesteDelphi\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:33:40.000.905,=D:\Projetos\Embarcadero\TesteDelphi\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:33:50.000.826,D:\Projetos\Embarcadero\TesteDelphi\DTO_Clientes.pas=D:\Projetos\Embarcadero\TesteDelphi\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:34:43.000.948,D:\Projetos\Embarcadero\TesteDelphi\data\DTO_Clientes.pas=D:\Projetos\Embarcadero\TesteDelphi\DTO_Clientes.pas</Transaction>
+    <Transaction>2022/11/08 17:37:22.000.652,D:\Projetos\Embarcadero\TesteDelphi\data\DAO_Clientes.pas=D:\Projetos\Embarcadero\TesteDelphi\DAO_Clientes.pas</Transaction>
+    <Transaction>2022/11/08 18:14:17.000.938,=D:\Projetos\Embarcadero\TesteDelphi\data\pedidos\DTO_Pedidos.pas</Transaction>
+    <Transaction>2022/11/08 18:14:17.000.872,=D:\Projetos\Embarcadero\TesteDelphi\data\pedidos\DAO_Pedidos.pas</Transaction>
+    <Transaction>2022/11/08 18:14:17.000.980,=D:\Projetos\Embarcadero\TesteDelphi\data\pedidos\DTO_Pedidos_detalhe.pas</Transaction>
+    <Transaction>2022/11/08 18:14:17.000.906,=D:\Projetos\Embarcadero\TesteDelphi\data\pedidos\DAO_Pedidos_detalhe.pas</Transaction>
+    <Transaction>2022/11/08 18:14:32.000.223,=D:\Projetos\Embarcadero\TesteDelphi\data\clientes\DTO_Clientes.pas</Transaction>
+    <Transaction>2022/11/08 18:14:32.000.197,=D:\Projetos\Embarcadero\TesteDelphi\data\clientes\DAO_Clientes.pas</Transaction>
+    <Transaction>2022/11/08 18:39:09.000.162,D:\Projetos\Embarcadero\TesteDelphi\data\pedidos\DTO_Pedido_produtos.pas=D:\Projetos\Embarcadero\TesteDelphi\data\pedidos\DTO_Pedidos_detalhe.pas</Transaction>
+    <Transaction>2022/11/08 18:50:44.000.877,D:\Projetos\Embarcadero\TesteDelphi\data\pedidos\DAO_Pedido_produtos.pas=D:\Projetos\Embarcadero\TesteDelphi\data\pedidos\DAO_Pedidos_detalhe.pas</Transaction>
+    <Transaction>2022/11/08 19:35:51.000.474,=D:\Projetos\Embarcadero\TesteDelphi\data\produtos\DTO_Produtos.pas</Transaction>
+    <Transaction>2022/11/08 19:35:51.000.447,=D:\Projetos\Embarcadero\TesteDelphi\data\produtos\DAO_Produtos.pas</Transaction>
+  </Transactions>
+</BorlandProject>

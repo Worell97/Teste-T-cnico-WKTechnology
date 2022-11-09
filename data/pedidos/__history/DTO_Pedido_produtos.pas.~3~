@@ -1,0 +1,98 @@
+unit DTO_Pedido_produtos;
+
+interface
+uses
+  System.Generics.Collections, FireDAC.Comp.Client;
+type
+  TDtoCliente = class;
+  TDtoClientes = class;
+  TDtoCliente = class(TObject)
+  private
+    { private declarations }
+    FId: System.Integer;
+    FPedido: System.Integer;
+    FCodProduto: System.Integer;
+    FQuantidade: System.Double;
+    FVlrUnitario: System.Double;
+    FVlrTotal: System.Double;
+    procedure InternalClear();
+    procedure SetCodigo(const ACodigo: System.Integer);
+    procedure SetNome(const ANome: System.String);
+    procedure SetCidade(const ACidade: System.String);
+    procedure SetUf(const AUf: System.String);
+    function GetCodigo(): System.Integer;
+    function GetNome(): System.String;
+    function GetCidade(): System.String;
+    function GetUf(): System.String;
+  public
+    constructor Create();
+    procedure Clear; inline;
+    property codigo: System.Integer read GetCodigo write SetCodigo;
+    property nome: System.String read GetNome write SetNome;
+    property cidade: System.String read GetCidade write SetCidade;
+    property uf: System.String read GetUf write SetUf;
+  end;
+  TDtoClientes = class(TObjectList<TDtoCliente>)
+  end;
+implementation
+{ TDtoCliente }
+
+procedure TDtoCliente.Clear;
+begin
+  Self.InternalClear();
+end;
+
+constructor TDtoCliente.Create();
+begin
+  Self.InternalClear();
+end;
+
+function TDtoCliente.GetCodigo: System.Integer;
+begin
+  Result := FId;
+end;
+
+function TDtoCliente.GetNome: System.String;
+begin
+  Result := FPedido;
+end;
+
+function TDtoCliente.GetCidade: System.String;
+begin
+  Result := FCodProduto;
+end;
+
+function TDtoCliente.GetUf: System.String;
+begin
+  Result := FQuantidade;
+end;
+
+procedure TDtoCliente.InternalClear;
+begin
+  FId := 0;
+  FPedido := '';
+  FCodProduto := '';
+  FQuantidade := '';
+end;
+
+procedure TDtoCliente.SetCodigo(const ACodigo: System.Integer);
+begin
+  FId := ACodigo;
+end;
+
+procedure TDtoCliente.SetNome(const ANome: System.String);
+begin
+  FPedido := ANome;
+end;
+
+procedure TDtoCliente.SetCidade(const ACidade: System.String);
+begin
+  FCodProduto :=ACidade;
+end;
+
+procedure TDtoCliente.SetUf(const AUf: System.String);
+begin
+  FQuantidade := AUf;
+end;
+
+end.

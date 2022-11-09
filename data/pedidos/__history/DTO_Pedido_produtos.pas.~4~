@@ -1,0 +1,104 @@
+unit DTO_Pedido_produtos;
+
+interface
+uses
+  System.Generics.Collections, FireDAC.Comp.Client;
+type
+  TDtoCliente = class;
+  TDtoClientes = class;
+  TDtoCliente = class(TObject)
+  private
+    { private declarations }
+    FId: System.Integer;
+    FPedido: System.Integer;
+    FCodProduto: System.Integer;
+    FQuantidade: System.Double;
+    FVlrUnitario: System.Double;
+    FVlrTotal: System.Double;
+    procedure InternalClear();
+    procedure SetId(const AId: System.Integer);
+    procedure SetPedido(const APedido: System.Integer);
+    procedure SetCodProduto(const ACodProduto: System.Integer);
+    procedure SetQuantidade(const AQuantidade: System.Double);
+    procedure SetVlrUnitario(const AVlrUnitario: System.Double);
+    procedure SetVlrTotal(const AVlrTotal: System.Double);
+    function GetId(): System.Integer;
+    function GetPedido(): System.Integer;
+    function GetCodProduto(): System.Integer;
+    function GetQuantidade(): System.Double;
+    function GetVlrUnitario(): System.Double;
+    function GetVlrTotal(): System.Double;
+  public
+    constructor Create();
+    procedure Clear; inline;
+    property Id: System.Integer read GetId write SetId;
+    property Pedido: System.Integer read GetPedido write SetPedido;
+    property CodProduto: System.Integer read GetCodProduto write SetCodProduto;
+    property Quantidade: System.Double read GetQuantidade write SetQuantidade;
+    property VlrUnitario: System.Double read GetVlrUnitario write SetVlrUnitario;
+    property VlrTotal: System.Double read GetVlrTotal write SetVlrTotal;
+  end;
+  TDtoClientes = class(TObjectList<TDtoCliente>)
+  end;
+implementation
+{ TDtoCliente }
+
+procedure TDtoCliente.Clear;
+begin
+  Self.InternalClear();
+end;
+
+constructor TDtoCliente.Create();
+begin
+  Self.InternalClear();
+end;
+
+function TDtoCliente.GetId: System.Integer;
+begin
+  Result := FId;
+end;
+
+function TDtoCliente.GetPedido: System.String;
+begin
+  Result := FPedido;
+end;
+
+function TDtoCliente.GetCodProduto: System.String;
+begin
+  Result := FCodProduto;
+end;
+
+function TDtoCliente.GetQuantidade: System.String;
+begin
+  Result := FQuantidade;
+end;
+
+procedure TDtoCliente.InternalClear;
+begin
+  FId := 0;
+  FPedido := '';
+  FCodProduto := '';
+  FQuantidade := '';
+end;
+
+procedure TDtoCliente.SetId(const AId: System.Integer);
+begin
+  FId := AId;
+end;
+
+procedure TDtoCliente.SetPedido(const APedido: System.String);
+begin
+  FPedido := APedido;
+end;
+
+procedure TDtoCliente.SetCodProduto(const ACodProduto: System.String);
+begin
+  FCodProduto :=ACodProduto;
+end;
+
+procedure TDtoCliente.SetQuantidade(const AQuantidade: System.String);
+begin
+  FQuantidade := AQuantidade;
+end;
+
+end.

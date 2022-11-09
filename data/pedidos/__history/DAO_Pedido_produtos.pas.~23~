@@ -1,0 +1,220 @@
+unit DAO_Pedido_produtos;
+
+interface
+uses
+  System.SysUtils,
+  Data.DB,
+  DTO_Pedido_produtos,
+  FireDAC.Comp.Client,
+  FireDAC.Stan.Param;
+type
+  TDaoPedidoProdutos = class
+
+//  id int AI PK
+//  pedido int
+//  codProduto int
+//  quantidade int
+//  vlrUnitario double
+//  vlrTotal double
+  strict private
+    const
+      Select: System.UnicodeString =
+          'SELECT ' +
+          '  id,'+
+          '  pedido,'+
+          '  codProduto,'+
+          '  quantidade,'+
+          '  vlrUnitario,'+
+          '  vlrTotal '+
+          'FROM ' +
+          '  pedidos_produtos ' +
+          'WHERE id = :id ';
+      Insert: System.UnicodeString =
+          'INSERT INTO pedidos_produtos(' +
+          '  pedido,'+
+          '  codProduto,'+
+          '  quantidade,'+
+          '  vlrUnitario,'+
+          '  vlrTotal) '+
+          'VALUES('+
+          '  :pedido,'+
+          '  :codProduto,'+
+          '  :quantidade,'+
+          '  :vlrUnitario,'+
+          '  :vlrTotal)';
+      Update: System.UnicodeString =
+          'UPDATE ' +
+          ' pedidos_produtos ' +
+          'SET ' +
+          '  pedido = :pedido, '+
+          '  codProduto = :codProduto, '+
+          '  quantidade = :quantidade, '+
+          '  vlrUnitario = :vlrUnitario, '+
+          '  vlrTotal= :vlrTotal ' +
+          'WHERE ' +
+          '  id = :id';
+
+      Delete: System.UnicodeString =
+          'DELETE FROM pedidos_produtos ' +
+          'WHERE ' +
+          '  id = :id';
+  private
+    FConnection: TFDConnection;
+    class procedure InternalLoad(var AQuery: TFDQuery; const AObject: TDtoPedidoProduto); static;
+    function GetNextID(AQuery: TFDQuery): System.Integer;
+  public
+      constructor Create(AConnection: TFDConnection);
+      procedure UnsafeSave(const AObject: TDtoPedidoProduto);
+      procedure Save(const AObject: TDtoPedidoProduto);
+      function Load (const AObject: TDtoPedidoProduto; const AId: System.Integer): Boolean;
+      function LoadListPorPedido (const AObjectList: TDtoPedidoProdutos; const APedido: System.Integer): Boolean;
+      procedure UnSafeDelete (const AId: System.Integer);
+      procedure SafeDelete (const AId: System.Integer);
+  end;
+implementation
+  uses
+    System.TypInfo;
+{ TDaoPedidoProdutos }
+
+constructor TDaoPedidoProdutos.Create(AConnection: TFDConnection);
+begin
+  FConnection := AConnection;
+end;
+
+class procedure TDaoPedidoProdutos.InternalLoad(var AQuery: TFDQuery;const AObject: TDtoPedidoProduto);
+begin
+  AObject.id := AQuery.FieldByName('id').AsInteger;
+  AObject.pedido := AQuery.FieldByName('pedido').AsInteger;
+  AObject.codProduto := AQuery.FieldByName('codProduto').AsInteger;
+  AObject.quantidade := AQuery.FieldByName('quantidade').ASFloat;
+  AObject.VlrUnitario := AQuery.FieldByName('VlrUnitario').ASFloat;
+  AObject.VlrTotal := AQuery.FieldByName('VlrTotal').ASFloat;
+end;
+
+function TDaoPedidoProdutos.Load(const AObject: TDtoPedidoProduto; const Aid: System.Integer): Boolean;
+const
+  CWhere =
+    'WHERE ' +
+    '  id = :id';
+var
+  LQuery: TFDQuery;
+begin
+  Result := False;
+  if (Aid > 0) then
+  begin
+    LQuery := TFDQuery.Create(nil);
+    LQuery.Connection := FConnection;
+    LQuery.SQL.Add(Select+CWhere);
+    LQuery.ParamByName('id').AsInteger := Aid;
+    LQuery.Open;
+    Result := not(LQuery.IsEmpty);
+    if not(LQuery.IsEmpty) then
+      InternalLoad(LQuery, AObject);
+  end;
+end;
+
+function TDaoPedidoProdutos.LoadListPorPedido(const AObjectList: TDtoPedidoProdutos;
+  const APedido: System.Integer): Boolean;
+const
+  CWhere =
+    'WHERE ' +
+    '  pedido = :pedido ';
+var
+  LQuery: TFDQuery;
+  LObjectAux : TDtoPedidoProduto;
+begin
+  Result := False;
+  if (APedido > 0) then
+  begin
+    LQuery := TFDQuery.Create(nil);
+    LQuery.Connection := FConnection;
+    LQuery.SQL.Add(Select+CWhere);
+    LQuery.ParamByName('pedido').AsInteger := APedido;
+    LQuery.Open;
+    Result := not(LQuery.IsEmpty);
+    if not(LQuery.IsEmpty) then
+    LQuery.First;
+    while not(LQuery.Eof) do
+    begin
+      LObjectAux := TDtoPedidoProduto.Create;
+      InternalLoad(LQuery, LObjectAux);
+      AObjectList.Add(LObjectAux);
+    end;
+  end;
+end;
+
+function TDaoPedidoProdutos.GetNextID(AQuery: TFDQuery): System.Integer;
+begin
+  AQuery.SQL.Clear;
+  AQuery.Open('SELECT GEN_ID(GEN_ClientesS, 1) as ID FROM RDB$DATABASE;');
+  if not(AQuery.IsEmpty) then
+    Result := AQuery.FieldByName('ID').AsInteger
+  else
+    Result := 0;
+  AQuery.SQL.Clear;
+end;
+
+procedure TDaoPedidoProdutos.SafeDelete(const Aid: System.Integer);
+begin
+  FConnection.StartTransaction;
+  try
+    UnSafeDelete(Aid);
+    FConnection.Commit;
+  except
+    FConnection.Rollback;
+    raise
+  end;
+end;
+
+procedure TDaoPedidoProdutos.Save(const AObject: TDtoPedidoProduto);
+begin
+   FConnection.StartTransaction;
+   try
+      UnsafeSave(AObject);
+      FConnection.Commit;
+   except
+      FConnection.Rollback;
+      raise;
+   end;
+end;
+
+procedure TDaoPedidoProdutos.UnSafeDelete(const Aid: System.Integer);
+var
+  LQuery: TFDQuery;
+begin
+  LQuery := TFDQuery.Create(nil);
+  LQuery.Connection := FConnection;
+  LQuery.SQL.Add(Delete);
+  LQuery.ParamByName('id').AsInteger := Aid;
+  LQuery.ExecSQL;
+end;
+
+procedure TDaoPedidoProdutos.UnsafeSave(const AObject: TDtoPedidoProduto);
+var
+  LQuery: TFDQuery;
+  Lid: System.Integer;
+begin
+  LQuery := TFDQuery.Create(nil);
+  LQuery.Connection := FConnection;
+  try
+    if (AObject.id <= 0) then
+    begin
+      LQuery.SQL.Add(Insert);
+    end else
+    begin
+      Lid := AObject.id;
+      LQuery.SQL.Add(Update);
+      LQuery.ParamByName('id').AsInteger := Lid;
+    end;
+
+    LQuery.ParamByName('pedido').AsInteger := AObject.pedido;
+    LQuery.ParamByName('codProduto').AsInteger:= AObject.codProduto;
+    LQuery.ParamByName('quantidade').AsFloat:= AObject.quantidade;
+    LQuery.ParamByName('vlrUnitario').AsFloat:= AObject.vlrUnitario;
+    LQuery.ParamByName('vlrTotal').AsFloat:= AObject.vlrTotal;
+    LQuery.ExecSQL;
+  finally
+    LQuery.Free;
+  end;
+end;
+end.

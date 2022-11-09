@@ -1,0 +1,160 @@
+unit DAO_Produtos;
+
+interface
+uses
+  System.SysUtils,
+  Data.DB,
+  DTO_Produtos,
+  FireDAC.Comp.Client,
+  FireDAC.Stan.Param,
+  FireDAC.DApt;
+type
+  TDaoProdutos = class
+  strict private
+    const
+      Select: System.UnicodeString =
+          'SELECT ' +
+          '  codigo,'+
+          '  descricao,'+
+          '  precoVenda '+
+          'FROM ' +
+          '  Produtos ';
+      Insert: System.UnicodeString =
+          'INSERT INTO Produtos(' +
+          '  codigo,'+
+          '  descricao,'+
+          '  precoVenda) '+
+          'VALUES('+
+          '  :codigo,'+
+          '  :descricao,'+
+          '  :precoVenda)';
+      Update: System.UnicodeString =
+          'UPDATE ' +
+          ' Produtos ' +
+          'SET ' +
+          '  descricao = :descricao, '+
+          '  precoVenda = :precoVenda ';
+
+      Delete: System.UnicodeString =
+          'DELETE FROM Produtos ' +
+          'WHERE ' +
+          '  codigo = :codigo';
+  private
+    FConnection: TFDConnection;
+    class procedure InternalLoad(var AQuery: TFDQuery; const AObject: TDtoProduto); static;
+    function GetNextID(AQuery: TFDQuery): System.Integer;
+  public
+      constructor Create(AConnection: TFDConnection);
+      procedure UnsafeSave(const AObject: TDtoProduto);
+      procedure Save(const AObject: TDtoProduto);
+      function Load   (const AObject: TDtoProduto; const ACodigo: System.Integer): Boolean;
+      procedure UnSafeDelete (const ACodigo: System.Integer);
+      procedure SafeDelete (const ACodigo: System.Integer);
+  end;
+implementation
+  uses
+    System.TypInfo;
+{ TDaoProdutos }
+
+constructor TDaoProdutos.Create(AConnection: TFDConnection);
+begin
+  FConnection := AConnection;
+end;
+
+class procedure TDaoProdutos.InternalLoad(var AQuery: TFDQuery;const AObject: TDtoProduto);
+begin
+  AObject.Codigo := AQuery.FieldByName('codigo').AsInteger;
+  AObject.descricao := AQuery.FieldByName('descricao').AsString;
+  AObject.precoVenda := AQuery.FieldByName('precoVenda').AsFloat;
+end;
+
+function TDaoProdutos.Load(const AObject: TDtoProduto; const ACodigo: System.Integer): Boolean;
+var
+  LQuery: TFDQuery;
+begin
+  Result := False;
+  if (ACodigo > 0) then
+  begin
+    LQuery := TFDQuery.Create(nil);
+    LQuery.Connection := FConnection;
+    LQuery.SQL.Add(Select);
+    LQuery.ParamByName('codigo').AsInteger := ACodigo;
+    LQuery.Open;
+    Result := not(LQuery.IsEmpty);
+    if not(LQuery.IsEmpty) then
+      InternalLoad(LQuery, AObject);
+  end;
+end;
+
+function TDaoProdutos.GetNextID(AQuery: TFDQuery): System.Integer;
+begin
+  AQuery.SQL.Clear;
+  AQuery.Open('SELECT GEN_ID(GEN_ProdutosS, 1) as ID FROM RDB$DATABASE;');
+  if not(AQuery.IsEmpty) then
+    Result := AQuery.FieldByName('ID').AsInteger
+  else
+    Result := 0;
+  AQuery.SQL.Clear;
+end;
+
+procedure TDaoProdutos.SafeDelete(const ACodigo: System.Integer);
+begin
+  FConnection.StartTransaction;
+  try
+    UnSafeDelete(ACodigo);
+    FConnection.Commit;
+  except
+    FConnection.Rollback;
+    raise
+  end;
+end;
+
+procedure TDaoProdutos.Save(const AObject: TDtoProduto);
+begin
+   FConnection.StartTransaction;
+   try
+      UnsafeSave(AObject);
+      FConnection.Commit;
+   except
+      FConnection.Rollback;
+      raise;
+   end;
+end;
+
+procedure TDaoProdutos.UnSafeDelete(const ACodigo: System.Integer);
+var
+  LQuery: TFDQuery;
+begin
+  LQuery := TFDQuery.Create(nil);
+  LQuery.Connection := FConnection;
+  LQuery.SQL.Add(Delete);
+  LQuery.ParamByName('codigo').AsInteger := ACodigo;
+  LQuery.ExecSQL;
+end;
+
+procedure TDaoProdutos.UnsafeSave(const AObject: TDtoProduto);
+var
+  LQuery: TFDQuery;
+  LCodigo: System.Integer;
+begin
+  LQuery := TFDQuery.Create(nil);
+  LQuery.Connection := FConnection;
+  try
+    if (AObject.codigo <= 0) then
+    begin
+      LCodigo := GetNextID(LQuery);
+      LQuery.SQL.Add(Insert);
+    end else
+    begin
+      LCodigo := AObject.codigo;
+      LQuery.SQL.Add(Update);
+    end;
+    LQuery.ParamByName('codigo').AsInteger := LCodigo;
+    LQuery.ParamByName('descricao').AsString := AObject.descricao;
+    LQuery.ParamByName('precoVenda').AsFloat := AObject.precoVenda;
+    LQuery.ExecSQL;
+  finally
+    LQuery.Free;
+  end;
+end;
+end.

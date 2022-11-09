@@ -1,0 +1,16 @@
+program TesteDelphi;
+
+uses
+  Vcl.Forms,
+  PedidosVenda in '..\PedidosVenda.pas' {Form1},
+  DAO_Clientes in 'data\DAO_Clientes.pas',
+  DTO_Clientes in 'data\DTO_Clientes.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

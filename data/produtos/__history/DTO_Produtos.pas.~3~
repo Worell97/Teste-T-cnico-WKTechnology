@@ -1,0 +1,96 @@
+unit DTO_Produtos;
+
+interface
+uses
+  System.Generics.Collections, FireDAC.Comp.Client;
+type
+  TDtoProduto = class;
+  TDtoProdutos = class;
+  TDtoProduto = class(TObject)
+  private
+    { private declarations }
+    FCodigo: System.Integer;
+    FNome: System.String;
+    FCidade: System.String;
+    FUf: System.String;
+    procedure InternalClear();
+    procedure SetCodigo(const ACodigo: System.Integer);
+    procedure SetNome(const ANome: System.String);
+    procedure SetCidade(const ACidade: System.String);
+    procedure SetUf(const AUf: System.String);
+    function GetCodigo(): System.Integer;
+    function GetNome(): System.String;
+    function GetCidade(): System.String;
+    function GetUf(): System.String;
+  public
+    constructor Create();
+    procedure Clear; inline;
+    property codigo: System.Integer read GetCodigo write SetCodigo;
+    property nome: System.String read GetNome write SetNome;
+    property cidade: System.String read GetCidade write SetCidade;
+    property uf: System.String read GetUf write SetUf;
+  end;
+  TDtoProdutos = class(TObjectList<TDtoProduto>)
+  end;
+implementation
+{ TDtoProduto }
+
+procedure TDtoProduto.Clear;
+begin
+  Self.InternalClear();
+end;
+
+constructor TDtoProduto.Create();
+begin
+  Self.InternalClear();
+end;
+
+function TDtoProduto.GetCodigo: System.Integer;
+begin
+  Result := FCodigo;
+end;
+
+function TDtoProduto.GetNome: System.String;
+begin
+  Result := FNome;
+end;
+
+function TDtoProduto.GetCidade: System.String;
+begin
+  Result := FCidade;
+end;
+
+function TDtoProduto.GetUf: System.String;
+begin
+  Result := FUf;
+end;
+
+procedure TDtoProduto.InternalClear;
+begin
+  FCodigo := 0;
+  FNome := '';
+  FCidade := '';
+  FUf := '';
+end;
+
+procedure TDtoProduto.SetCodigo(const ACodigo: System.Integer);
+begin
+  FCodigo := ACodigo;
+end;
+
+procedure TDtoProduto.SetNome(const ANome: System.String);
+begin
+  FNome := ANome;
+end;
+
+procedure TDtoProduto.SetCidade(const ACidade: System.String);
+begin
+  FCidade :=ACidade;
+end;
+
+procedure TDtoProduto.SetUf(const AUf: System.String);
+begin
+  FUf := AUf;
+end;
+
+end.
